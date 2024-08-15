@@ -1,12 +1,12 @@
 {
   "build": {
     "development": {
-      "workflow": "managed",
+      "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
-      "workflow": "managed",
       "distribution": "internal"
-    }
+    },
+    "production": {}
   }
 }
