@@ -26,15 +26,15 @@ const DeviceMap: React.FC<DeviceMapProps> = ({ location, name, timestamp }) => {
         <Marker
           coordinate={location}
           title={name}
-          description={`Última localização em: ${timestamp?.toLocaleString()}`}
+          description={`Last location in: ${timestamp?.toLocaleString()}`}
         />
       </MapView>
       <View style={styles.infoContainer}>
         <Text>
-          Última localização: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+          Last location: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
         </Text>
         {timestamp && (
-          <Text>Data da última localização: {timestamp.toLocaleString()}</Text>
+          <Text>Date of last location: {timestamp.toLocaleString()}</Text>
         )}
       </View>
     </View>

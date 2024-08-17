@@ -1,23 +1,28 @@
-import React from 'react';
-import { Button, ScrollView, TouchableOpacity, View, Linking, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { Button, TouchableOpacity, View, Linking, Platform } from 'react-native';
 import { Container, Scroll, Text, DeviceItem, DeviceText, ErrorText } from '../theme/global';
 import { useBluetooth } from './hooks/useBluetooth';
 import { useLocation } from './hooks/useLocation';
+import { requestBluetoothPermissions } from './utils/requestPermissions';
 
 const App = () => {
   const { devices, errorMsg: bluetoothErrorMsg, selectedDevice, handleDeviceClick, fetchConnectedDevices } = useBluetooth();
   const { location, errorMsg: locationErrorMsg } = useLocation();
+
+  useEffect(() => {
+    requestBluetoothPermissions();
+  }, []);
 
   const openMap = (latitude: number, longitude: number) => {
     const url = `https://www.bing.com/maps?q=${latitude},${longitude}`;
     
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
-        Linking.openURL(url).catch((err) => console.error('Erro ao abrir o URL:', err));
+        Linking.openURL(url).catch((err) => console.error('Error opening the URL:', err));
       } else {
-        console.error('Não é possível abrir o URL.');
+        console.error('It is not possible to open the URL.');
       }
-    }).catch((err) => console.error('Erro ao verificar o URL:', err));
+    }).catch((err) => console.error('Error when checking the URL:', err));
   };
 
   return (
@@ -26,47 +31,47 @@ const App = () => {
       {bluetoothErrorMsg && <ErrorText>{bluetoothErrorMsg}</ErrorText>}
       {location && (
         <Text>
-          Localização atual: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+          Current location: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
         </Text>
       )}
 
-      <Button title="Atualizar Dispositivos" onPress={fetchConnectedDevices} />
+      <Button title="Update Devices" onPress={fetchConnectedDevices} />
 
-      <Text>Dispositivos Bluetooth conhecidos:</Text>
+      <Text>Known Bluetooth devices:</Text>
       <Scroll>
         {devices.length > 0 ? (
           devices.map((device, index) => (
             <TouchableOpacity key={index} onPress={() => handleDeviceClick(device)}>
               <DeviceItem>
-                <DeviceText>Nome: {device.name}</DeviceText>
+                <DeviceText>Name: {device.name}</DeviceText>
                 <DeviceText>ID: {device.id}</DeviceText>
                 <DeviceText>
-                  Status: {device.connected ? 'Conectado' : 'Desconectado'}
+                  Status: {device.connected ? 'Connected' : 'Offline'}
                 </DeviceText>
               </DeviceItem>
             </TouchableOpacity>
           ))
         ) : (
-          <Text>Nenhum dispositivo conhecido encontrado.</Text>
+          <Text>No known device found.</Text>
         )}
       </Scroll>
 
       {selectedDevice && (
         <View>
-          <Text>Dispositivo selecionado:</Text>
-          <Text>Nome: {selectedDevice.name}</Text>
+          <Text>Selected device:</Text>
+          <Text>Name: {selectedDevice.name}</Text>
           <Text>ID: {selectedDevice.id}</Text>
           <Text>
-            Status: {selectedDevice.connected ? 'Conectado' : 'Desconectado'}
+            Status: {selectedDevice.connected ? 'Connected' : 'Offline'}
           </Text>
           {'location' in selectedDevice && selectedDevice.location ? (
             <>
               <Text>
-                Última localização: {selectedDevice.location.latitude.toFixed(6)}, {selectedDevice.location.longitude.toFixed(6)}
+                Last location: {selectedDevice.location.latitude.toFixed(6)}, {selectedDevice.location.longitude.toFixed(6)}
               </Text>
               {selectedDevice.timestamp && (
                 <Text>
-                  Data da última localização: {selectedDevice.timestamp.toLocaleString()}
+                  Date of last location: {selectedDevice.timestamp.toLocaleString()}
                 </Text>
               )}
               <TouchableOpacity
@@ -76,11 +81,11 @@ const App = () => {
                   }
                 }}
               >
-                <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>Abrir no mapa</Text>
+                <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>Open no map</Text>
               </TouchableOpacity>
             </>
           ) : (
-            <Text>Nenhuma localização registrada.</Text>
+            <Text>No location registered.</Text>
           )}
         </View>
       )}

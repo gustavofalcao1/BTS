@@ -33,7 +33,7 @@ export const useBluetooth = () => {
       if (error instanceof Error) {
         setErrorMsg(error.message);
       } else {
-        setErrorMsg('Ocorreu um erro desconhecido.');
+        setErrorMsg('An unknown mistake occurred.');
       }
     }
   };
@@ -46,7 +46,7 @@ export const useBluetooth = () => {
       if (error instanceof Error) {
         setErrorMsg(error.message);
       } else {
-        setErrorMsg('Ocorreu um erro desconhecido.');
+        setErrorMsg('An unknown mistake occurred.');
       }
       return null;
     }
