@@ -1,96 +1,69 @@
-import React, { useEffect } from 'react';
-import { Button, TouchableOpacity, View, Linking, Platform } from 'react-native';
-import { Container, Scroll, Text, DeviceItem, DeviceText, ErrorText } from '../theme/global';
-import { useBluetooth } from './hooks/useBluetooth';
-import { useLocation } from './hooks/useLocation';
-import { requestBluetoothPermissions } from './utils/requestPermissions';
+// App.tsx
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Welcome from './screens/Welcome';
+import App from './App';
+import { PermissionsAndroid, Platform, AppState, View, Text, ActivityIndicator, AppStateStatus } from 'react-native';
 
-const App = () => {
-  const { devices, errorMsg: bluetoothErrorMsg, selectedDevice, handleDeviceClick, fetchConnectedDevices } = useBluetooth();
-  const { location, errorMsg: locationErrorMsg } = useLocation();
+const Stack = createStackNavigator();
+
+const Router = () => {
+  const [isPermissionsGranted, setPermissionsGranted] = useState<boolean | null>(null);
+  const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
 
   useEffect(() => {
-    requestBluetoothPermissions();
-  }, []);
+    const checkPermissions = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const bluetoothPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
+          const locationPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
 
-  const openMap = (latitude: number, longitude: number) => {
-    const url = `https://www.bing.com/maps?q=${latitude},${longitude}`;
-    
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url).catch((err) => console.error('Error opening the URL:', err));
+          if (bluetoothPermission && locationPermission) {
+            setPermissionsGranted(true);
+          } else {
+            setPermissionsGranted(false);
+          }
+        } catch (error) {
+          console.warn(error);
+          setPermissionsGranted(false);
+        }
       } else {
-        console.error('It is not possible to open the URL.');
+        setPermissionsGranted(true);
       }
-    }).catch((err) => console.error('Error when checking the URL:', err));
-  };
+    };
+
+    checkPermissions();
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        checkPermissions();
+      }
+      setAppState(nextAppState);
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [appState]);
+
+  if (isPermissionsGranted === null) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View>;
+  }
 
   return (
-    <Container>
-      {locationErrorMsg && <ErrorText>{locationErrorMsg}</ErrorText>}
-      {bluetoothErrorMsg && <ErrorText>{bluetoothErrorMsg}</ErrorText>}
-      {location && (
-        <Text>
-          Current location: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
-        </Text>
-      )}
-
-      <Button title="Update Devices" onPress={fetchConnectedDevices} />
-
-      <Text>Known Bluetooth devices:</Text>
-      <Scroll>
-        {devices.length > 0 ? (
-          devices.map((device, index) => (
-            <TouchableOpacity key={index} onPress={() => handleDeviceClick(device)}>
-              <DeviceItem>
-                <DeviceText>Name: {device.name}</DeviceText>
-                <DeviceText>ID: {device.id}</DeviceText>
-                <DeviceText>
-                  Status: {device.connected ? 'Connected' : 'Offline'}
-                </DeviceText>
-              </DeviceItem>
-            </TouchableOpacity>
-          ))
+    <NavigationContainer>
+      <Stack.Navigator>
+        {isPermissionsGranted ? (
+          <Stack.Screen name="App" component={App} />
         ) : (
-          <Text>No known device found.</Text>
+          <Stack.Screen name="Welcome" component={Welcome} />
         )}
-      </Scroll>
-
-      {selectedDevice && (
-        <View>
-          <Text>Selected device:</Text>
-          <Text>Name: {selectedDevice.name}</Text>
-          <Text>ID: {selectedDevice.id}</Text>
-          <Text>
-            Status: {selectedDevice.connected ? 'Connected' : 'Offline'}
-          </Text>
-          {'location' in selectedDevice && selectedDevice.location ? (
-            <>
-              <Text>
-                Last location: {selectedDevice.location.latitude.toFixed(6)}, {selectedDevice.location.longitude.toFixed(6)}
-              </Text>
-              {selectedDevice.timestamp && (
-                <Text>
-                  Date of last location: {selectedDevice.timestamp.toLocaleString()}
-                </Text>
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  if (selectedDevice.location) {
-                    openMap(selectedDevice.location.latitude, selectedDevice.location.longitude);
-                  }
-                }}
-              >
-                <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>Open no map</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text>No location registered.</Text>
-          )}
-        </View>
-      )}
-    </Container>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
-export default App;
+export default Router;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NativeModules, Alert } from 'react-native';
+import { NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocation } from './useLocation';
 

@@ -13,6 +13,12 @@ export const Scroll: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   </ScrollView>
 );
 
+export const Title: React.FC<{ children: React.ReactNode, style?: any }> = ({ children, style }) => (
+  <RNText style={[styles.title, style]}>
+    {children}
+  </RNText>
+);
+
 export const Text: React.FC<{ children: React.ReactNode, style?: any }> = ({ children, style }) => (
   <RNText style={[styles.text, style]}>
     {children}
@@ -37,18 +43,6 @@ export const ErrorText: React.FC<{ children: React.ReactNode }> = ({ children })
   </RNText>
 );
 
-export const Button: React.FC<{ children: React.ReactNode, onPress?: () => void }> = ({ children, onPress }) => (
-  <TouchableOpacity style={styles.button} onPress={onPress}>
-    {children}
-  </TouchableOpacity>
-);
-
-export const ButtonText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <RNText style={styles.buttonText}>
-    {children}
-  </RNText>
-);
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -66,6 +60,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginBottom: 12,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
   },
   deviceItem: {
     backgroundColor: '#fff',
@@ -87,18 +87,5 @@ const styles = StyleSheet.create({
     color: '#f00',
     textAlign: 'center',
     marginTop: 16,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    borderRadius: 15,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  buttonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  }
 });

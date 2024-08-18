@@ -14,7 +14,7 @@ export const useLocation = () => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permissão para acessar localização foi negada');
+        setErrorMsg('Permission to access location was denied');
         return;
       }
 
@@ -44,7 +44,7 @@ export const useLocation = () => {
         if (error instanceof Error) {
           setErrorMsg(error.message);
         } else {
-          setErrorMsg('Ocorreu um erro desconhecido.');
+          setErrorMsg('An unknown mistake occurred.');
         }
       }
     })();
