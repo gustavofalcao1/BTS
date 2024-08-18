@@ -44,7 +44,7 @@ export const useLocation = () => {
         if (error instanceof Error) {
           setErrorMsg(error.message);
         } else {
-          setErrorMsg('An unknown mistake occurred.');
+          setErrorMsg('Ocorreu um erro desconhecido.');
         }
       }
     })();
