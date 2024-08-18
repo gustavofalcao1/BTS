@@ -2,7 +2,7 @@
   "expo": {
     "name": "BTS",
     "slug": "BTS",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "orientation": "portrait",
     "platforms": [
       "ios",
@@ -35,8 +35,7 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_LOCATION",
         "FOREGROUND_SERVICE_CONNECTED_DEVICE"
-      ],
-      "package": "com.gustavofalcao1.BTS"
+      ]
     },
     "web": {
       "bundler": "metro",
