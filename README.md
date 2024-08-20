@@ -36,7 +36,6 @@
   yarn prebuild
 ```
 
-
 <!-- ## Screenshots
 <p align="center">
   <img src="screenshots/00.png" alt="BTS") width="300"/>
